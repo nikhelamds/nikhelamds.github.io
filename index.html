@@ -259,45 +259,6 @@
     color: var(--accent-blue); 
   }
 
-  /* Drone Telemetry Strip Header */
-  .telemetry-bar {
-    font-size: 11px;
-    color: var(--grey-text);
-    padding: 6px 12px;
-    background: rgba(13, 19, 31, 0.9);
-    border: 1px solid var(--border-color);
-    border-bottom: none;
-    border-radius: var(--radius) var(--radius) 0 0;
-    display: flex;
-    justify-content: space-between;
-    font-family: 'IBM Plex Mono', monospace;
-  }
-
-  /* ---------- Readout strip ---------- */
-  .readout {
-    border: 1px solid var(--border-color);
-    background: var(--card-bg);
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    border-radius: 0 0 var(--radius) var(--radius);
-  }
-  .readout div {
-    padding: 18px 20px;
-    border-left: 1px solid var(--border-color);
-  }
-  .readout div:first-child { border-left: none; }
-  .readout .val {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 22px;
-    font-weight: 500;
-    color: var(--grey-text);
-  }
-  .readout .label {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 4px;
-  }
-
   /* ---------- Sections ---------- */
   section { padding: 72px 0; border-bottom: 1px solid var(--border-color); }
   section:last-of-type { border-bottom: none; }
@@ -362,8 +323,6 @@
 
   @media (max-width: 640px) {
     .project { grid-template-columns: 1fr; }
-    .readout { grid-template-columns: repeat(2, 1fr); }
-    .readout div:nth-child(3) { border-left: none; }
     .drone-hud, .compass-hud { display: none; }
   }
 
@@ -483,35 +442,7 @@
     <p class="tagline">As a Data Science student passionate about using analytics, computer vision, and drone technology for wildlife conservation and decision-making, I specialize in integrating fieldwork, data pipeline development, and analytical insights across both marine research and growing organizations.</p>
     <div class="hero-cta">
       <a href="#projects" class="btn btn-primary">View projects</a>
-      <a href="#" class="btn btn-ghost">Download resume</a>
-    </div>
-
-    <div style="margin-top: 56px;">
-      <div class="telemetry-bar">
-        <span>SYS: ONLINE</span>
-        <span>LAT: 48.5321° N</span>
-        <span>LON: -123.0081° W</span>
-        <span>SONAR: ACTIVE [14Hz]</span>
-        <span>SIG: 5.8 GHz</span>
-      </div>
-      <div class="readout">
-        <div>
-          <div class="val mono">4</div>
-          <div class="label">Projects shipped</div>
-        </div>
-        <div>
-          <div class="val mono">Python / SQL</div>
-          <div class="label">Core tools</div>
-        </div>
-        <div>
-          <div class="val mono">2026</div>
-          <div class="label">Actively building</div>
-        </div>
-        <div>
-          <div class="val mono">Open</div>
-          <div class="label">To opportunities</div>
-        </div>
-      </div>
+      <a href="Nikhela_MothadeSilva_Resume.pdf" target="_blank" download="Nikhela_MothadeSilva_Resume.pdf" class="btn btn-ghost">Download resume</a>
     </div>
   </div>
 </header>
@@ -553,79 +484,20 @@
 
     <div class="project">
       <div class="project-meta">
-        <span class="mono">01 — Analytics</span>
-        Retail sales dataset
+        <span class="mono">01 — Computer Vision / AI</span>
+        Aerial Marine Research
       </div>
       <div>
-        <h3>Sales & Revenue Dashboard</h3>
-        <p>Analyzed a retail transactions dataset to surface revenue trends, top-performing products, and regional performance gaps. Delivered a set of recommendations to prioritize underperforming regions.</p>
+        <h3>OrcaVision</h3>
+        <p>AI-assisted computer vision pipeline designed to process aerial drone imagery for Southern Resident Killer Whale (SRKW) tracking, data annotation, and marine wildlife conservation research.</p>
         <div class="tags">
           <span class="tag">Python</span>
-          <span class="tag">Pandas</span>
-          <span class="tag">Plotly</span>
+          <span class="tag">Computer Vision</span>
+          <span class="tag">Annotation</span>
+          <span class="tag">Drone Telemetry</span>
         </div>
         <div class="project-links">
-          <a href="#">Live demo →</a>
-          <a href="#">Code →</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="project">
-      <div class="project-meta">
-        <span class="mono">02 — Machine Learning</span>
-        Telecom dataset
-      </div>
-      <div>
-        <h3>Customer Churn Prediction</h3>
-        <p>Built a classification model to predict subscription cancellations, then translated model output into a ranked list of at-risk customers and suggested retention actions.</p>
-        <div class="tags">
-          <span class="tag">scikit-learn</span>
-          <span class="tag">Random Forest</span>
-          <span class="tag">Pandas</span>
-        </div>
-        <div class="project-links">
-          <a href="#">Live demo →</a>
-          <a href="#">Code →</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="project">
-      <div class="project-meta">
-        <span class="mono">03 — Statistics</span>
-        Conversion data
-      </div>
-      <div>
-        <h3>A/B Test Analysis</h3>
-        <p>Ran a statistical significance test on a website conversion experiment and wrote up a plain-language recommendation on whether to ship the change.</p>
-        <div class="tags">
-          <span class="tag">Statistics</span>
-          <span class="tag">SciPy</span>
-          <span class="tag">Report writing</span>
-        </div>
-        <div class="project-links">
-          <a href="#">Live demo →</a>
-          <a href="#">Code →</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="project">
-      <div class="project-meta">
-        <span class="mono">04 — Research</span>
-        Public market data
-      </div>
-      <div>
-        <h3>Industry Trend Report</h3>
-        <p>Pulled public market data on marine conservation tech and produced a short analytical report with charts and a clear point of view on where the market is heading.</p>
-        <div class="tags">
-          <span class="tag">Excel</span>
-          <span class="tag">Data storytelling</span>
-        </div>
-        <div class="project-links">
-          <a href="#">Live demo →</a>
-          <a href="#">Code →</a>
+          <a href="https://github.com/nikhelamds/orcavision" target="_blank" rel="noopener">Code →</a>
         </div>
       </div>
     </div>

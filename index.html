@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nikhela Motha de Silva — Data & Business Analyst</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-dark: #070A0F;
+    --card-bg: rgba(13, 19, 31, 0.75);
+    --border-color: #1E293B;
+    --text-main: #E2E8F0;
+    --text-muted: #94A3B8;
+    --accent-blue: #38BDF8; /* Light Sky Blue */
+    --accent-blue-hover: #0EA5E9;
+    --accent-glow: rgba(56, 189, 248, 0.25);
+    --radar-green: #10B981;
+    --grey-text: #64748B;
+    --radius: 4px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'IBM Plex Mono', monospace;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Tactical Grid Overlay Effect */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: 
+      linear-gradient(rgba(30, 41, 59, 0.2) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30, 41, 59, 0.2) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* Ocean Radar Radial Ambient Glow */
+  body::after {
+    content: "";
+    position: fixed;
+    top: -20%;
+    right: -10%;
+    width: 60vw;
+    height: 60vw;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, rgba(16, 185, 129, 0.03) 40%, transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* Drone HUD Reticle Element */
+  .drone-hud {
+    position: fixed;
+    top: 15%;
+    right: 5%;
+    width: 180px;
+    height: 180px;
+    border: 1px dashed rgba(56, 189, 248, 0.25);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .drone-hud::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    background: var(--accent-blue);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--accent-blue);
+  }
+  .drone-hud::after {
+    content: "+48.5321° N  -123.0081° W";
+    position: absolute;
+    bottom: -22px;
+    font-size: 9px;
+    color: var(--grey-text);
+    letter-spacing: 0.05em;
+  }
+
+  /* Fixed Compass / Altitude HUD Overlay */
+  .compass-hud {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    font-size: 10px;
+    color: var(--grey-text);
+    background: rgba(13, 19, 31, 0.85);
+    border: 1px solid var(--border-color);
+    padding: 6px 12px;
+    border-radius: var(--radius);
+    backdrop-filter: blur(8px);
+    pointer-events: none;
+    z-index: 10;
+    display: flex;
+    gap: 12px;
+  }
+  .compass-hud span { color: var(--accent-blue); }
+
+  a { color: inherit; }
+
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  h1, h2, h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .mono {
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* ---------- Nav ---------- */
+  nav {
+    position: sticky;
+    top: 0;
+    background: rgba(7, 10, 15, 0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color);
+    z-index: 10;
+  }
+  nav .wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+  }
+  .nav-brand {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--accent-blue);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-brand span.pulse {
+    width: 8px;
+    height: 8px;
+    background-color: var(--radar-green);
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 8px var(--radar-green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+    font-size: 14px;
+  }
+  .nav-links a {
+    text-decoration: none;
+    color: var(--text-muted);
+    transition: color 0.15s;
+  }
+  .nav-links a:hover, .nav-links a:focus-visible { color: var(--accent-blue); }
+
+  /* ---------- Hero ---------- */
+  header.hero {
+    padding: 88px 0 40px;
+    position: relative;
+  }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--grey-text);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .eyebrow-badge {
+    background: rgba(56, 189, 248, 0.1);
+    color: var(--accent-blue);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+  }
+
+  h1.name {
+    font-size: clamp(38px, 6vw, 56px);
+    line-height: 1.05;
+    margin-bottom: 16px;
+    color: #F8FAFC;
+  }
+  .tagline {
+    font-size: 18px;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin-bottom: 32px;
+  }
+  .hero-cta {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-block;
+    padding: 11px 20px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1px solid var(--border-color);
+    transition: all 0.15s;
+  }
+  .btn-primary {
+    background: var(--accent-blue);
+    color: var(--bg-dark);
+    font-weight: 600;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+  }
+  .btn-primary:hover, .btn-primary:focus-visible { 
+    background: var(--accent-blue-hover); 
+    border-color: var(--accent-blue-hover);
+    color: var(--bg-dark);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-main);
+  }
+  .btn-ghost:hover, .btn-ghost:focus-visible { 
+    border-color: var(--accent-blue); 
+    color: var(--accent-blue); 
+  }
+
+  /* Drone Telemetry Strip Header */
+  .telemetry-bar {
+    font-size: 11px;
+    color: var(--grey-text);
+    padding: 6px 12px;
+    background: rgba(13, 19, 31, 0.9);
+    border: 1px solid var(--border-color);
+    border-bottom: none;
+    border-radius: var(--radius) var(--radius) 0 0;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* ---------- Readout strip ---------- */
+  .readout {
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-radius: 0 0 var(--radius) var(--radius);
+  }
+  .readout div {
+    padding: 18px 20px;
+    border-left: 1px solid var(--border-color);
+  }
+  .readout div:first-child { border-left: none; }
+  .readout .val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--grey-text);
+  }
+  .readout .label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* ---------- Sections ---------- */
+  section { padding: 72px 0; border-bottom: 1px solid var(--border-color); }
+  section:last-of-type { border-bottom: none; }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 36px;
+  }
+  .section-head .index {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--accent-blue);
+  }
+  .section-head h2 { font-size: 26px; color: #F8FAFC; }
+
+  /* About */
+  .about-text { max-width: 620px; color: var(--text-muted); font-size: 16px; }
+  .about-text strong { color: var(--text-main); font-weight: 600; }
+
+  /* Projects */
+  .project {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 24px;
+    padding: 26px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    background: var(--card-bg);
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  .project:hover {
+    border-color: rgba(56, 189, 248, 0.5);
+    box-shadow: 0 0 25px rgba(56, 189, 248, 0.12);
+    transform: translateY(-2px);
+  }
+  .project-meta { color: var(--text-muted); font-size: 13px; }
+  .project-meta .mono { display: block; margin-bottom: 8px; color: var(--accent-blue); }
+  .project h3 { font-size: 19px; color: #F8FAFC; margin-bottom: 8px; }
+  .project p { color: var(--text-muted); font-size: 15px; margin-bottom: 12px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    padding: 3px 8px;
+    background: rgba(30, 41, 59, 0.8);
+    border-radius: var(--radius);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+  }
+  .project-links a {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--grey-text);
+    text-decoration: none;
+    margin-right: 16px;
+  }
+  .project-links a:hover { color: var(--accent-blue); text-decoration: underline; }
+
+  @media (max-width: 640px) {
+    .project { grid-template-columns: 1fr; }
+    .readout { grid-template-columns: repeat(2, 1fr); }
+    .readout div:nth-child(3) { border-left: none; }
+    .drone-hud, .compass-hud { display: none; }
+  }
+
+  /* Skills */
+  .skill-groups { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  .skill-group h4 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-blue);
+    margin-bottom: 12px;
+  }
+  .skill-group ul { list-style: none; }
+  .skill-group li {
+    font-size: 14.5px;
+    color: var(--text-muted);
+    padding: 6px 0;
+    border-top: 1px solid var(--border-color);
+  }
+  .skill-group li:first-child { border-top: none; }
+
+  @media (max-width: 640px) {
+    .skill-groups { grid-template-columns: 1fr; }
+  }
+
+  /* Experience */
+  .exp-item {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 20px;
+    padding: 24px 0;
+    border-top: 1px solid var(--border-color);
+  }
+  .exp-item:first-child { border-top: none; }
+  .exp-date { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--text-muted); }
+  .exp-item h3 { font-size: 16px; color: #F8FAFC; margin-bottom: 4px; }
+  .exp-item .org { color: var(--grey-text); font-size: 14px; margin-bottom: 8px; }
+  .exp-item p { color: var(--text-muted); font-size: 14.5px; }
+
+  .exp-stream-tag {
+    display: inline-block;
+    font-size: 11px;
+    color: var(--accent-blue);
+    margin-top: 8px;
+    opacity: 0.85;
+  }
+
+  @media (max-width: 640px) {
+    .exp-item { grid-template-columns: 1fr; }
+  }
+
+  /* Contact */
+  .contact-links { display: flex; flex-direction: column; gap: 4px; margin-top: 20px; }
+  .contact-links a {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px;
+    text-decoration: none;
+    color: var(--text-main);
+    padding: 12px 0;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    transition: color 0.15s;
+  }
+  .contact-links a:first-child { border-top: none; }
+  .contact-links a:hover, .contact-links a:focus-visible { color: var(--accent-blue); }
+  .contact-links a span.arrow { color: var(--text-muted); }
+
+  footer {
+    padding: 28px 0 40px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  :focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="drone-hud"></div>
+
+<div class="compass-hud">
+  <div>BRG: <span>042° NE</span></div>
+  <div>ALT: <span>120m AGL</span></div>
+  <div>BAT: <span>98%</span></div>
+</div>
+
+<nav>
+  <div class="wrap">
+    <div class="nav-brand">
+      <span class="pulse"></span> NIKHELA MOTHA DE SILVA
+    </div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">
+      <span>Data &amp; Business Analytics</span>
+      <span class="eyebrow-badge">FAA PART 107 PILOT</span>
+    </div>
+    <h1 class="name">Nikhela Motha de Silva</h1>
+    <p class="tagline">As a Data Science student passionate about using analytics, computer vision, and drone technology for wildlife conservation and decision-making, I specialize in integrating fieldwork, data pipeline development, and analytical insights across both marine research and growing organizations.</p>
+    <div class="hero-cta">
+      <a href="#projects" class="btn btn-primary">View projects</a>
+      <a href="#" class="btn btn-ghost">Download resume</a>
+    </div>
+
+    <div style="margin-top: 56px;">
+      <div class="telemetry-bar">
+        <span>SYS: ONLINE</span>
+        <span>LAT: 48.5321° N</span>
+        <span>LON: -123.0081° W</span>
+        <span>SONAR: ACTIVE [14Hz]</span>
+        <span>SIG: 5.8 GHz</span>
+      </div>
+      <div class="readout">
+        <div>
+          <div class="val mono">4</div>
+          <div class="label">Projects shipped</div>
+        </div>
+        <div>
+          <div class="val mono">Python / SQL</div>
+          <div class="label">Core tools</div>
+        </div>
+        <div>
+          <div class="val mono">2026</div>
+          <div class="label">Actively building</div>
+        </div>
+        <div>
+          <div class="val mono">Open</div>
+          <div class="label">To opportunities</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="about">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="index mono">01</span>
+      <h2>About</h2>
+    </div>
+    <div class="about-text">
+      <p><strong>Bridging the gap between the Pacific Northwest and data pipelines, I use data science, computer vision, and drones to turn raw wildlife research and complex analytics into actionable insights.</strong></p>
+      <br>
+
+      <p>I am a Data Science student at Chapman University with a passion for leveraging tech to drive both marine conservation and data-informed strategy. As a Co-Founder at Orca IQ and a certified FAA Part 107 Drone Pilot, my work spans the full data lifecycle—from piloting drones to gather high-resolution aerial data in the field to building labeled datasets, managing quality control, and engineering workflows for AI-assisted research.</p>
+      <br>
+
+      <p>My experience balances technical precision with strategic communication:</p>
+      <br>
+
+      <ul style="margin-left: 20px; padding-left: 20px;">
+        <li><strong>Field &amp; Marine Research:</strong> Collecting and analyzing critical data in the Pacific Northwest to support Southern Resident Killer Whale (SRKW) conservation.</li>
+        <li><strong>Data Intelligence &amp; Analytics:</strong> Translating complex metrics into clear, actionable reports for leadership teams and optimization strategies.</li>
+        <li><strong>Technical Skills:</strong> Python, Java, C++, Computer Vision/Drone Data Collection, Statistical Analysis, and Project Management.</li>
+      </ul>
+      <br>
+
+      <p>Whether I’m managing AI research workflows, building data pipelines, or analyzing metrics to drive decisions, I thrive on solving complex problems with tech and analytics.</p>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="index mono">02</span>
+      <h2>Projects</h2>
+    </div>
+
+    <div class="project">
+      <div class="project-meta">
+        <span class="mono">01 — Analytics</span>
+        Retail sales dataset
+      </div>
+      <div>
+        <h3>Sales & Revenue Dashboard</h3>
+        <p>Analyzed a retail transactions dataset to surface revenue trends, top-performing products, and regional performance gaps. Delivered a set of recommendations to prioritize underperforming regions.</p>
+        <div class="tags">
+          <span class="tag">Python</span>
+          <span class="tag">Pandas</span>
+          <span class="tag">Plotly</span>
+        </div>
+        <div class="project-links">
+          <a href="#">Live demo →</a>
+          <a href="#">Code →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-meta">
+        <span class="mono">02 — Machine Learning</span>
+        Telecom dataset
+      </div>
+      <div>
+        <h3>Customer Churn Prediction</h3>
+        <p>Built a classification model to predict subscription cancellations, then translated model output into a ranked list of at-risk customers and suggested retention actions.</p>
+        <div class="tags">
+          <span class="tag">scikit-learn</span>
+          <span class="tag">Random Forest</span>
+          <span class="tag">Pandas</span>
+        </div>
+        <div class="project-links">
+          <a href="#">Live demo →</a>
+          <a href="#">Code →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-meta">
+        <span class="mono">03 — Statistics</span>
+        Conversion data
+      </div>
+      <div>
+        <h3>A/B Test Analysis</h3>
+        <p>Ran a statistical significance test on a website conversion experiment and wrote up a plain-language recommendation on whether to ship the change.</p>
+        <div class="tags">
+          <span class="tag">Statistics</span>
+          <span class="tag">SciPy</span>
+          <span class="tag">Report writing</span>
+        </div>
+        <div class="project-links">
+          <a href="#">Live demo →</a>
+          <a href="#">Code →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-meta">
+        <span class="mono">04 — Research</span>
+        Public market data
+      </div>
+      <div>
+        <h3>Industry Trend Report</h3>
+        <p>Pulled public market data on marine conservation tech and produced a short analytical report with charts and a clear point of view on where the market is heading.</p>
+        <div class="tags">
+          <span class="tag">Excel</span>
+          <span class="tag">Data storytelling</span>
+        </div>
+        <div class="project-links">
+          <a href="#">Live demo →</a>
+          <a href="#">Code →</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="skills">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="index mono">03</span>
+      <h2>Skills</h2>
+    </div>
+    <div class="skill-groups">
+      <div class="skill-group">
+        <h4>Languages & Tools</h4>
+        <ul>
+          <li>Python (Pandas, NumPy)</li>
+          <li>SQL</li>
+          <li>Java / C++</li>
+          <li>Excel / Google Sheets</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <h4>Analysis & ML</h4>
+        <ul>
+          <li>Statistical testing</li>
+          <li>Computer Vision</li>
+          <li>Data Pipelines</li>
+          <li>Quality Control</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <h4>Field & Ops</h4>
+        <ul>
+          <li>FAA Part 107 Pilot</li>
+          <li>Drone Data Collection</li>
+          <li>Project Management</li>
+          <li>Technical Reporting</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="index mono">04</span>
+      <h2>Experience</h2>
+    </div>
+
+    <div class="exp-item">
+      <div class="exp-date mono">May 2026 — Present</div>
+      <div>
+        <h3>Co-Founder &amp; Project Manager</h3>
+        <div class="org">Orca IQ — Seattle, WA</div>
+        <p>Coordinated project timelines, workflows, and team assignments for AI-assisted orca research. Managed drone footage labeling, data collection, and quality control across team projects while collaborating with researchers and interns to streamline workflows.</p>
+        <span class="exp-stream-tag mono">[LOG: AI_VISION_ANNOTATION]</span>
+      </div>
+    </div>
+
+    <div class="exp-item">
+      <div class="exp-date mono">May 2025 — Aug 2025</div>
+      <div>
+        <h3>Data Intelligence Intern</h3>
+        <div class="org">InfinitiOne Investment Banking — Remote</div>
+        <p>Assisted with accurate data collection, performance analysis, and reporting to support marketing initiatives. Tracked campaign performance metrics, created social media content, and compiled insights to optimize content strategy.</p>
+        <span class="exp-stream-tag mono">[LOG: ANALYTICAL_REPORTING]</span>
+      </div>
+    </div>
+
+    <div class="exp-item">
+      <div class="exp-date mono">Oct 2023 — Jan 2024</div>
+      <div>
+        <h3>Data Science Intern</h3>
+        <div class="org">Map-Collective — Washington, DC</div>
+        <p>Analyzed 10+ marketing metrics across multiple campaigns to identify trends and support data-driven decisions. Created detailed reports and presented key insights to leadership, including the CEO and SVP.</p>
+        <span class="exp-stream-tag mono">[LOG: METRICS_EVALUATION]</span>
+      </div>
+    </div>
+
+    <div class="exp-item">
+      <div class="exp-date mono">May 2023 — Oct 2023</div>
+      <div>
+        <h3>Research Assistant</h3>
+        <div class="org">Wild Orca — San Juan Island, WA</div>
+        <p>Collected SRKW scat samples and conducted field research to analyze stress, nutrition, and migration patterns in wild populations. Performed data entry, statistical analysis, photo identification, and wrote detailed field reports.</p>
+        <span class="exp-stream-tag mono">[LOG: FIELD_SAMPLING_SRKW]</span>
+      </div>
+    </div>
+
+    <div class="exp-item">
+      <div class="exp-date mono">May 2021 — Aug 2021</div>
+      <div>
+        <h3>Drone Pilot Intern</h3>
+        <div class="org">The Center for Whale Research — Friday Harbor, WA</div>
+        <p>Piloted drones to capture high-resolution aerial data on SRKW behavior and ecology. Maintained full compliance with FAA Part 107 regulations during all drone flight operations and field activities.</p>
+        <span class="exp-stream-tag mono">[LOG: 4K_AERIAL_SURVEY]</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="index mono">05</span>
+      <h2>Contact</h2>
+    </div>
+    <p class="about-text">Open to data science, computer vision, and analytics roles — feel free to reach out.</p>
+    <div class="contact-links">
+      <a href="mailto:mothadesilva@chapman.edu">mothadesilva@chapman.edu <span class="arrow">↗</span></a>
+      <a href="tel:2065889141">(206) 588-9141 <span class="arrow">↗</span></a>
+      <a href="https://linkedin.com/in/nikhela-motha-de-silva" target="_blank">linkedin.com/in/nikhela-motha-de-silva <span class="arrow">↗</span></a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Nikhela Motha de Silva © 2026</div>
+</footer>
+
+</body>
+</html>
